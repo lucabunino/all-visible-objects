@@ -7,26 +7,26 @@
 	const DURATION = 200
 
 	/** @type {string | null | undefined} */
-	let hoveredSlug = $state(null)
+	let hoveredId = $state(null)
 </script>
 
 <h1 class="sr-only">All Visible Object</h1>
 
 <ul class="works">
-	{#each data.works as work (work.slug?.current)}
+	{#each data.works as work (work._id)}
 		<li class="work">
 			<a
 				href="/works/{work.client?.slug?.current}/{work.slug?.current}"
-				onmouseenter={() => (hoveredSlug = work.slug?.current)}
-				onmouseleave={() => (hoveredSlug = null)}
-				onfocus={() => (hoveredSlug = work.slug?.current)}
-				onblur={() => (hoveredSlug = null)}
+				onmouseenter={() => (hoveredId = work._id)}
+				onmouseleave={() => (hoveredId = null)}
+				onfocus={() => (hoveredId = work._id)}
+				onblur={() => (hoveredId = null)}
 			>
 				<Media media={work.thumbnail} class="homepage" width=50/>
 				<div class="tags">
 					<span class="tag client">{work.client ? work.client.title : 'Missing client'}</span>
 					<span class="tag title">{work.title}</span>
-					{#if hoveredSlug === work.slug?.current}
+					{#if hoveredId === work._id}
 						<span class="tag view black" in:revealWidth={{ duration: DURATION }} out:revealWidth={{ duration: DURATION }}>View project</span>
 					{/if}
 				</div>

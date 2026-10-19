@@ -29,6 +29,7 @@ const mediaFields = `
 const media = `{${mediaFields}}`
 
 const workCard = `{
+	_id,
 	title,
 	subtitle,
 	slug,

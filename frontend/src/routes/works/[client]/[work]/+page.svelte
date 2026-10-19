@@ -138,7 +138,7 @@
 		<nav id="related" aria-label="Related works">
 			<h3>More projects to explore</h3>
 			<ul class="related">
-				{#each data.work.related as related (related.slug?.current)}
+				{#each data.work.related as related (related._id)}
 					<li class="work">
 						<a href="/works/{related.client?.slug.current}/{related.slug?.current}">
 							<Media media={related.thumbnail} width={25}/>
