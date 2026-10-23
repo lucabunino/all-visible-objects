@@ -36,11 +36,6 @@ export default {
 			group: 'Info',
 		},
 		{
-			name: 'subtitle',
-			type: 'string',
-			group: 'Info',
-		},
-		{
 			name: 'client',
 			type: 'reference',
 			to: [{type: 'client'}],

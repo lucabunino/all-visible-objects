@@ -12,9 +12,13 @@
 	--worksWidth: 20rem;
 	--headerHeight: 4rem;
 	--footerHeight: 4rem;
-	--transition: cubic-bezier(0.42, 0, 0.58, 1) .5s;
-	--transition-s: cubic-bezier(.33, 1, .68, 1) .3s;
-	--transition-xs: cubic-bezier(.33, 1, .68, 1) .2s;
+	--ease: cubic-bezier(0.37, 0, 0.63, 1);
+	--ease-out: cubic-bezier(.33, 1, .68, 1);
+	--ease-in-out: cubic-bezier(.77, 0, .175, 1);
+	--transition: var(--ease) .5s;
+	--transition-s: var(--ease-out) .3s;
+	--transition-xs: var(--ease-out) .2s;
+	--transition-tag: var(--ease-in-out) .3s;
 
 	@for $i from 1 through 200 {
 		--sp-#{$i}: #{calc($i / 14)}rem;
@@ -76,7 +80,7 @@ body {
 	cursor: pointer;
 	white-space: pre;
 	border-radius: 3px;
-	transition: border-radius .3s cubic-bezier(.77, 0, .175, 1);
+	transition: border-radius var(--transition-tag);
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;

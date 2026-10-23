@@ -22,13 +22,13 @@
 				onfocus={() => (hoveredId = work._id)}
 				onblur={() => (hoveredId = null)}
 			>
-				<Media media={work.thumbnail} class="homepage" width=50/>
+				<Media media={work.thumbnail} class="homepage" width={50}/>
 				<div class="tags">
 					<span class="tag client">{work.client ? work.client.title : 'Missing client'}</span>
 					<span class="tag title">{work.title}</span>
-					{#if hoveredId === work._id}
+					<!-- {#if hoveredId === work._id}
 						<span class="tag view black" in:revealWidth={{ duration: DURATION }} out:revealWidth={{ duration: DURATION }}>View project</span>
-					{/if}
+					{/if} -->
 				</div>
 			</a>
 		</li>

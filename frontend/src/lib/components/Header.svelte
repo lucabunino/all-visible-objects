@@ -442,12 +442,15 @@ header {
 						.clients {
 							position: fixed;
 							left: var(--sp-15);
+							row-gap: var(--sp-8);
+							padding-top: var(--sp-8);
 						}
 
 						.works {
 							position: fixed;
 							left: var(--sp-15);
-							padding: var(--sp-5) 0;
+							padding: var(--sp-8) 0 var(--sp-5);
+							row-gap: var(--sp-8);
 							z-index: 1;
 							// display: flex;
 							// flex-direction: column;

@@ -96,14 +96,12 @@
 	></button>
 
 	{#key media[index]}
-		<Media media={media[index]} class="gallery" blur={false} opacity={true} scale={false} duration={300} width=50/>
+		<Media media={media[index]} class="gallery" blur={false} opacity={true} scale={false} duration={300} width={50}/>
 	{/key}
 </div>
 
 {#if hovered}
-	{#key hovered}
-		<CursorTag direction={hovered} />
-	{/key}
+	<CursorTag direction={hovered} />
 {/if}
 
 <style lang="scss">

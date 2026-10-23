@@ -3,14 +3,12 @@
 	import PortableTextStyle from '$lib/components/PortableTextStyle.svelte'
 	import Media from '$lib/components/Media.svelte'
 	import Gallery from '$lib/components/Gallery.svelte'
-	import CursorTag from '$lib/components/CursorTag.svelte'
 	import { pageIn, pageOut } from '$lib/utils/transitions.js'
 	import { getGallery } from '$lib/stores/gallery.svelte.js'
 	import { urlFor, gallerySrcset, gallerySizes } from '$lib/utils/image.js'
 	import { page } from '$app/state'
 
 	let { data } = $props()
-	let hoveredBlock = $state(false)
 	const gallery = getGallery()
 	const DURATION = 300
 
@@ -66,8 +64,6 @@
 									type="button"
 									class="media-trigger"
 									onclick={() => gallery.openGallery(galleryMedia.findIndex((m) => m._key === item._key))}
-									onmouseenter={() => (hoveredBlock = true)}
-									onmouseleave={() => (hoveredBlock = false)}
 									aria-label="View in gallery"
 								>
 									<Media media={item} width={100 / block.items.length}/>
@@ -142,8 +138,8 @@
 					<li class="work">
 						<a href="/works/{related.client?.slug.current}/{related.slug?.current}">
 							<Media media={related.thumbnail} width={25}/>
+							<span class="client">{related.client?.title}</span>
 							<span class="title">{related.title}</span>
-							{#if related.subtitle}<span class="subtitle">{related.subtitle}</span>{/if}
 						</a>
 					</li>
 				{/each}
@@ -151,10 +147,6 @@
 		</nav>
 	{/if}
 </article>
-
-{#if hoveredBlock}
-	<CursorTag label="View" />
-{/if}
 
 <style lang="scss">
 @use '$lib/scss/breakpoints.module' as bp;
@@ -182,10 +174,6 @@ article {
 
 			.block {
 				width: 100%;
-
-				&:not(:first-child) {
-					margin-left: -1px;
-				}
 
 				&.textItem {
 					display: block;
@@ -275,11 +263,11 @@ article {
 							transform: scale(1.02);
 						}
 					}
-					.title {
+					.client {
 						display: block;
 						margin-top: var(--sp-7);
 					}
-					.subtitle {
+					.title {
 						color: var(--gray);
 					}
 				}
@@ -306,12 +294,6 @@ article {
 				flex-direction: column;
 
 				.block {
-					margin-left: 0;
-
-					&:not(:first-child) {
-						margin-top: -1px;
-					}
-
 					&.textItem {
 						width: 100%;
 					}

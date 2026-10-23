@@ -25,9 +25,13 @@
 
 	const sizes = $derived(isGallery ? gallerySizes(bp, width) : `(max-width: ${bp}px) 100vw, ${width}vw`)
 
-	const aspectRatio = $derived(media?.type === 'video' ? media?.posterAspectRatio : media?.aspectRatio)
-	const aspectRatioMobile = $derived(media?.type === 'video' ? media?.posterAspectRatio : media?.aspectRatioMobile || media?.aspectRatio)
-	const lqip = $derived(media?.type === 'video' ? media?.posterLqip : media?.lqip)
+	// snap to 2 decimals so exports a pixel off (2250x2813 vs 4:5) share a ratio —
+	// otherwise row neighbours differ by a subpixel and leave a hairline gap
+	/** @param {number | undefined} ratio */
+	const snap = (ratio) => (ratio ? Math.round(ratio * 100) / 100 : ratio)
+
+	const aspectRatio = $derived(snap(media?.type === 'video' ? media?.posterAspectRatio : media?.aspectRatio))
+	const aspectRatioMobile = $derived(snap(media?.type === 'video' ? media?.posterAspectRatio : media?.aspectRatioMobile || media?.aspectRatio))
 	const palette = $derived(media?.type === 'video' ? media?.posterPalette : media?.palette)
 
 	let loaded = $state(false)
@@ -47,11 +51,14 @@
 
 	// iOS Safari sometimes ignores the `muted` HTML attribute on videos that
 	// gain their <source> children after mount, silently blocking autoplay —
-	// setting the `muted` DOM property directly and retrying play() fixes it
+	// setting the `muted` DOM property directly and retrying play() fixes it.
+	// The SSR'd video can also fire `loadeddata` before hydration attaches the
+	// handler (slow JS, e.g. dev with empty cache), so check readyState too
 	/** @param {HTMLVideoElement} node */
 	function ensureAutoplay(node) {
 		node.muted = true
 		node.play?.().catch(() => {})
+		if (node.readyState >= 2) loaded = true
 	}
 </script>
 
@@ -63,12 +70,7 @@
 	style:background-color={palette}
 	{@attach observeEntry}
 >
-	<div
-		class="content"
-		class:opacity
-		class:loaded={loaded && entered}
-		style:background-image={lqip ? `url(${lqip})` : undefined}
-	>
+	<div class="content" class:opacity class:loaded={loaded && entered}>
 		{#if media?.type === 'video' && media.video}
 			<video autoplay muted loop playsinline class:blur class:scale class:loaded={loaded && entered} poster={safely(() => urlFor(media.videoPoster)?.url())} onloadeddata={() => (loaded = true)} {@attach ensureAutoplay}>
 				{#if media.videoMobile}
@@ -105,15 +107,12 @@
 		position: relative;
 		overflow: hidden;
 		isolation: isolate;
-		background-color: var(--gray-subtle);
-		aspect-ratio: var(--aspect-ratio, 1);
+		background-color: var(--gray-subtle);		aspect-ratio: var(--aspect-ratio, 1);
 
 		.content {
 			position: absolute;
 			inset: 0;
-			background-size: cover;
-			background-position: center;
-			transition: opacity var(--duration) cubic-bezier(0.42, 0, 0.58, 1) 100ms, transform var(--transition-xs);
+			transition: opacity var(--duration) var(--ease) 100ms, transform var(--transition-xs);
 
 			&.opacity {
 				opacity: 0;
@@ -138,14 +137,15 @@
 			max-width: 100%;
 			object-fit: cover;
 			object-position: center;
-			will-change: filter, transform;
 			transition: var(--transition);
 
+			// end on `none` (not blur(0)/scale(1)) so the browser drops the
+			// compositing layer once loaded — layered edges render subpixel seams
 			&.blur {
 				filter: blur(20px);
 
 				&.loaded {
-					filter: blur(0);
+					filter: none;
 				}
 			}
 
@@ -153,7 +153,7 @@
 				transform: scale(1.02);
 
 				&.loaded {
-					transform: scale(1);
+					transform: none;
 				}
 			}
 		}

@@ -12,12 +12,6 @@
 
 	let imageIndex = $state(0)
 	$effect(() => {
-		document.documentElement.style.backgroundColor = 'black'
-		return () => {
-			document.documentElement.style.backgroundColor = ''
-		}
-	})
-	$effect(() => {
 		const images = data.about.images
 		if (!images?.length) return
 		const interval = setInterval(() => {
@@ -91,7 +85,7 @@ article {
 	padding: calc(var(--sp-15) + var(--tagHeight) + var(--sp-20)) var(--sp-15) var(--sp-15);
 	min-height: 100svh;
 	align-content: space-between;
-	color: var(--white);
+	color: var(--black);
 
 	.title {
 		color: var(--gray-light);
@@ -127,6 +121,7 @@ article {
 			position: relative;
 			aspect-ratio: 3 / 4;
 			overflow: hidden;
+			border-radius: 3px;
 
 			.frame {
 				position: absolute;

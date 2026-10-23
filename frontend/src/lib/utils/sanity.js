@@ -16,14 +16,12 @@ const mediaFields = `
 	imageMobile,
 	"aspectRatio": image.asset->metadata.dimensions.aspectRatio,
 	"aspectRatioMobile": imageMobile.asset->metadata.dimensions.aspectRatio,
-	"lqip": image.asset->metadata.lqip,
 	"palette": image.asset->metadata.palette.dominant.background,
 	video{asset->{url}},
 	videoMobile{asset->{url}},
 	videoPoster,
 	videoPosterMobile,
 	"posterAspectRatio": videoPoster.asset->metadata.dimensions.aspectRatio,
-	"posterLqip": videoPoster.asset->metadata.lqip,
 	"posterPalette": videoPoster.asset->metadata.palette.dominant.background
 `
 const media = `{${mediaFields}}`
@@ -31,7 +29,6 @@ const media = `{${mediaFields}}`
 const workCard = `{
 	_id,
 	title,
-	subtitle,
 	slug,
 	client->{title, slug},
 	thumbnail ${media}
@@ -90,7 +87,6 @@ export async function getWork(clientSlug, workSlug) {
 	return client.fetch(
 		`*[_type == "work" && slug.current == $workSlug && client->slug.current == $clientSlug][0]{
 			title,
-			subtitle,
 			status,
 			client-> {
 				title,

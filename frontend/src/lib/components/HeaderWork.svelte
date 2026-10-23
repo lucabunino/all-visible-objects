@@ -282,6 +282,11 @@
 						.tag {
 							width: calc(100vw - var(--sp-30));
 						}
+
+						.works {
+							row-gap: var(--sp-8);
+							padding-top: var(--sp-8);
+						}
 					}
 				}
 			}
