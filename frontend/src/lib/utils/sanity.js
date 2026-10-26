@@ -49,14 +49,17 @@ export async function getNav() {
 	}`)
 }
 
+// header/footer only need the contact links — the full about doc is fetched
+// by the about page itself
+export async function getContact() {
+	return client.fetch(`*[_type == "about"][0]{email, instagram}`)
+}
+
 export async function getAbout() {
 	return client.fetch(`*[_type == "about"][0]{
 		description,
 		email,
 		instagram,
-		approach,
-		philosophy,
-		methodology,
 		capabilities[]{_key, "title": @->title},
 		"clients": clients[]{_key, "title": @->title},
 		commissions,
@@ -71,6 +74,22 @@ export async function getPolicies() {
 /** @param {string} slug */
 export async function getPolicy(slug) {
 	return client.fetch(`*[_type == "policy" && slug.current == $slug][0]{title, content}`, { slug })
+}
+
+// every public url, for sitemap.xml and llms.txt
+export async function getSitemap() {
+	return client.fetch(`{
+		"works": *[_type == "work" && status != "hidden" && client->status != "hidden" && defined(slug.current)]{
+			title,
+			"slug": slug.current,
+			"client": client->{title, "slug": slug.current},
+			_updatedAt
+		},
+		"policies": *[_type == "policy" && defined(slug.current)]{title, "slug": slug.current, _updatedAt},
+		"about": *[_type == "about"][0]{_updatedAt},
+		"homepage": *[_type == "homepage"][0]{_updatedAt},
+		"seo": *[_type == "seo"][0]{seoTitle, seoDescription}
+	}`)
 }
 
 export async function getHomepage() {

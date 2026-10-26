@@ -2,9 +2,9 @@
 	import { tick } from 'svelte'
 	import { scrollY, innerWidth } from 'svelte/reactivity/window'
 	import { page } from '$app/state'
-	import { afterNavigate } from '$app/navigation'
+	import { afterNavigate, beforeNavigate } from '$app/navigation'
 	import { getTemplate } from '$lib/utils/template'
-	import { revealWidth } from '$lib/utils/transitions.js'
+	import { revealWidth, PAGE_DURATION } from '$lib/utils/transitions.js'
 	import { getGallery } from '$lib/stores/gallery.svelte.js'
 	import bp from '$lib/scss/breakpoints.module.scss'
 
@@ -19,8 +19,8 @@
 	// header hides while actively scrolling down, reappears only while
 	// actively scrolling up (idle/tiny jitter changes nothing, avoiding
 	// interrupted/restarted out-transitions) — always visible at the very
-	// top of the page, and disabled entirely on work pages (isWork =
-	// !showNav), where HeaderWork's own row takes over
+	// top of the page, and disabled entirely on mobile and on work pages
+	// (isWork = !showNav), where HeaderWork's own row takes over
 	const SCROLL_THRESHOLD = 50 // ignore direction this close to the top
 	const SCROLL_DELTA = 10 // minimum movement before a direction change registers
 	let lastScrollY = $state(0)
@@ -28,7 +28,7 @@
 
 	$effect(() => {
 		const y = scrollY.current ?? 0
-		if (!showNav || y <= 0) {
+		if (!showNav || isMobile || y <= 0) {
 			headerVisible = true
 			lastScrollY = y
 			return
@@ -43,10 +43,22 @@
 		}
 	})
 
-	afterNavigate(() => closeAll())
+	// on page change, tags leave instantly (no outro competing with the page
+	// transition) and the new ones reveal after it (TAG_DELAY). `leaving` stays
+	// true one tick past afterNavigate so the menu's closing outros are instant too
+	let leaving = $state(false)
+	beforeNavigate(({ to, willUnload }) => {
+		if (to?.route.id && !willUnload) leaving = true
+	})
+	afterNavigate(() => {
+		closeAll()
+		tick().then(() => (leaving = false))
+	})
 
 	const DURATION = 300
 	const STEP = 50
+	const TAG_STEP = 0 // stagger between top-level tags
+	const TAG_DELAY = PAGE_DURATION // top-level tags reveal once the page transition is done
 	const OPEN_DELAY = 150
 
 	let worksOpen = $state(false)
@@ -65,10 +77,16 @@
 
 	let activeClient = $derived(nav.find((c) => c.slug?.current === activeClientSlug))
 
+	// immediate tap feedback: the pressed tag turns black on pointerdown, before
+	// the client swap / page load (pointercancel = finger scrolled the list)
+	/** @type {string | null | undefined} */
+	let pressed = $state(null)
+
 	function closeAll() {
 		clearTimeout(openTimeout)
 		worksOpen = false
 		activeClientSlug = null
+		pressed = null
 	}
 
 	// ---- mouseover mode: exactly how it worked before any click-mode work ----
@@ -102,31 +120,23 @@
 
 	// ---- click mode: minimal, click-to-select + click-outside-to-close ----
 
-	// mousedown fires before focus, so this captures true prior state —
-	// toggleWorksClick then toggles off that, not off the live worksOpen
-	// (which onfocus may have just flipped true on this same interaction)
-	let worksOpenBeforeInteraction = false
-
-	function captureWorksOpenState() {
-		worksOpenBeforeInteraction = worksOpen
-	}
-
+	// click only (no focus/mousedown tricks) — Safari doesn't focus buttons on
+	// tap, so focus-based opening made the two browsers disagree
 	function toggleWorksClick() {
-		worksOpen = !worksOpenBeforeInteraction
-		if (!worksOpen) activeClientSlug = null
+		if (worksOpen) closeAll()
+		else worksOpen = true
 	}
 
+	// composedPath() is fixed at dispatch, so a tapped client/back button that
+	// re-renders away during this same click still counts as inside the nav
+	// (target.isConnected would be false by now and wrongly close the menu)
 	/** @param {MouseEvent} e */
 	function handleWindowClick(e) {
-		if (!isMobile || !worksOpen) return
-		if (e.target instanceof Node && !navEl?.contains(e.target)) closeAll()
+		if (!isMobile || !worksOpen || !navEl) return
+		if (!e.composedPath().includes(navEl)) closeAll()
 	}
 
 	// ---- keyboard: finder-column nav, same in both modes ----
-
-	function focusWorksButton() {
-		worksOpen = true
-	}
 
 	/** @param {KeyboardEvent} e */
 	function handleWorksKeydown(e) {
@@ -201,7 +211,11 @@
 {#snippet worksDropdown()}
 	{#if worksOpen}
 		{#if isMobile}
-			<div class="backdrop" aria-hidden="true"></div>
+			<!-- covers the page *and* the Works button while open, so a second tap on
+			Works (or anywhere outside the menu) lands here — keyboard users close
+			with Escape / the Works button instead -->
+			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+			<div class="backdrop" aria-hidden="true" onclick={closeAll}></div>
 		{/if}
 		<div id="clients">
 			<ul role="menu" aria-label="Clients" class="clients overflow-y" class:mobileHidden={isMobile && activeClient}>
@@ -212,13 +226,18 @@
 						bind:this={clientRefs[i]}
 						data-slug={client.slug?.current}
 						in:revealWidth|global={{ duration: DURATION, delay: i * STEP }}
-						out:revealWidth|global={{ duration: worksOpen ? 0 : DURATION }}
-						class:active={activeClientSlug === client.slug?.current}
+						out:revealWidth|global={{ duration: worksOpen || leaving ? 0 : DURATION }}
+						class:active={activeClientSlug === client.slug?.current || pressed === client.slug?.current}
 						class:inactive={activeClient && activeClientSlug !== client.slug?.current}
 						aria-expanded={activeClientSlug === client.slug?.current}
 						onmouseenter={() => !isMobile && (activeClientSlug = client.slug?.current)}
-						onclick={() => (activeClientSlug = client.slug?.current)}
-						onfocus={() => (activeClientSlug = client.slug?.current)}
+						onpointerdown={() => (pressed = client.slug?.current)}
+						onpointercancel={() => (pressed = null)}
+						onclick={() => {
+							activeClientSlug = client.slug?.current
+							pressed = null
+						}}
+						onfocus={() => !isMobile && (activeClientSlug = client.slug?.current)}
 						onkeydown={(e) => handleClientKeydown(e, i, client.slug?.current)}
 						>
 							<span class="title">{client.title}</span>
@@ -232,7 +251,7 @@
 					<li class="tag-wrapper">
 						<button class="tag" type="button" aria-label="Close" onclick={closeAll}
 						in:revealWidth|global={{ duration: DURATION, delay: nav.length * STEP }}
-						out:revealWidth|global={{ duration: worksOpen ? 0 : DURATION }}
+						out:revealWidth|global={{ duration: worksOpen || leaving ? 0 : DURATION }}
 						>× Close</button>
 					</li>
 				{/if}
@@ -244,9 +263,13 @@
 						<li class="work tag-wrapper">
 							<a class="tag" href="/works/{activeClient.slug?.current}/{work.slug?.current}"
 							bind:this={workRefs[i]}
+							class:active={pressed === `work:${work.slug?.current}`}
+							onpointerdown={() => (pressed = `work:${work.slug?.current}`)}
+							onpointercancel={() => (pressed = null)}
+							onclick={() => (pressed = `work:${work.slug?.current}`)}
 							onkeydown={(e) => handleWorkKeydown(e, i)}
 							in:revealWidth|global={{ duration: DURATION, delay: i * STEP }}
-							out:revealWidth|global={{ duration: activeClient ? 0 : DURATION }}
+							out:revealWidth|global={{ duration: activeClient || leaving ? 0 : DURATION }}
 							>
 							{work.title}</a>
 						</li>
@@ -255,7 +278,7 @@
 						<li class="work tag-wrapper">
 							<button class="tag" type="button" aria-label="Back" onclick={() => (activeClientSlug = null)}
 							in:revealWidth|global={{ duration: DURATION, delay: activeClient.works.length * STEP }}
-							out:revealWidth|global={{ duration: activeClient ? 0 : DURATION }}
+							out:revealWidth|global={{ duration: activeClient || leaving ? 0 : DURATION }}
 							>← Back</button>
 						</li>
 					{/if}
@@ -270,37 +293,37 @@
 		<div style:display="contents" role="menubar" tabindex="-1" bind:this={headerEl} onkeydown={handleTopLevelKeydown}>
 			{#if !gallery.open && !(isMobile && !showNav)}
 				<a id="logo" class="tag" href="/"
-				in:revealWidth|global={{ duration: DURATION, delay: DURATION }}
-				out:revealWidth|global={{ duration: DURATION }}>All Visible Objects</a>
+				in:revealWidth|global={{ duration: DURATION, delay: TAG_DELAY }}
+				out:revealWidth|global={{ duration: leaving ? 0 : DURATION }}>All Visible Objects</a>
 			{/if}
 			<nav aria-label="Main" id="menu" style:--clientsCount={nav.length}>
 				<ul class="menu" bind:this={navEl}>
 					{#if showNav && !isMobile}
 						<li id="works" class="menu-item tag-wrapper" onmouseenter={openWorksHover} onmouseleave={closeWorksHover} onfocusin={openWorksHover} onfocusout={handleWorksFocusOut}
-						in:revealWidth|global={{ duration: DURATION, delay: DURATION }}
-						out:revealWidth|global={{ duration: DURATION }}>
+						in:revealWidth|global={{ duration: DURATION, delay: TAG_DELAY+TAG_STEP*1 }}
+						out:revealWidth|global={{ duration: leaving ? 0 : DURATION }}>
 							<button class="tag no-pointer" class:active={worksOpen} type="button" bind:this={worksButtonEl} onkeydown={handleWorksKeydown} aria-haspopup="true" aria-expanded={worksOpen} aria-controls="clients">Works</button>
 							{@render worksDropdown()}
 						</li>
 					{:else if showNav}
 						<li id="works" class="menu-item tag-wrapper"
-						in:revealWidth|global={{ duration: DURATION, delay: DURATION }}
-						out:revealWidth|global={{ duration: DURATION }}>
-							<button class="tag" class:active={worksOpen} type="button" bind:this={worksButtonEl} onmousedown={captureWorksOpenState} onclick={toggleWorksClick} onfocus={focusWorksButton} onkeydown={handleWorksKeydown} aria-haspopup="true" aria-expanded={worksOpen} aria-controls="clients">Works</button>
+						in:revealWidth|global={{ duration: DURATION, delay: TAG_DELAY+TAG_STEP*1 }}
+						out:revealWidth|global={{ duration: leaving ? 0 : DURATION }}>
+							<button class="tag" class:active={worksOpen} type="button" bind:this={worksButtonEl} onclick={toggleWorksClick} onkeydown={handleWorksKeydown} aria-haspopup="true" aria-expanded={worksOpen} aria-controls="clients">Works</button>
 							{@render worksDropdown()}
 						</li>
 					{/if}
 					{#if showNav}
 						<li class="menu-item about tag-wrapper"
-						in:revealWidth|global={{ duration: DURATION, delay: DURATION+STEP*1 }}
-						out:revealWidth|global={{ duration: DURATION }}>
+						in:revealWidth|global={{ duration: DURATION, delay: TAG_DELAY+TAG_STEP*2 }}
+						out:revealWidth|global={{ duration: leaving ? 0 : DURATION }}>
 							<a class="tag" href="/about">About</a>
 						</li>
 					{/if}
 					{#if about.instagram?.href && showNav}
 						<li class="menu-item instagram tag-wrapper"
-						in:revealWidth|global={{ duration: DURATION, delay: DURATION }}
-						out:revealWidth|global={{ duration: DURATION }}>
+						in:revealWidth|global={{ duration: DURATION, delay: TAG_DELAY+TAG_STEP*3 }}
+						out:revealWidth|global={{ duration: leaving ? 0 : DURATION }}>
 							<a class="tag" href={about.instagram.href} target="_blank" rel="noopener noreferrer">{about.instagram.handle}</a>
 						</li>
 					{/if}

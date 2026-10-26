@@ -1,8 +1,8 @@
 <script>
 	import { urlFor, gallerySrcset, gallerySizes } from '$lib/utils/image.js'
 
-	/** @type {{media: any, bp?: number, width?: number, class?: string, opacity?: boolean, blur?: boolean, scale?: boolean, duration?: number}} */
-	let { media, bp = 768, width = 100, class: className = '', opacity = true, blur = true, scale = false, duration = 500 } = $props()
+	/** @type {{media: any, bp?: number, width?: number, class?: string, opacity?: boolean, blur?: boolean, scale?: boolean, duration?: number, eager?: boolean}} */
+	let { media, bp = 768, width = 100, class: className = '', opacity = true, blur = true, scale = false, duration = 500, eager = false } = $props()
 
 	/** @param {() => string | undefined} fn */
 	function safely(fn) {
@@ -26,9 +26,10 @@
 	const sizes = $derived(isGallery ? gallerySizes(bp, width) : `(max-width: ${bp}px) 100vw, ${width}vw`)
 
 	// snap to 2 decimals so exports a pixel off (2250x2813 vs 4:5) share a ratio —
-	// otherwise row neighbours differ by a subpixel and leave a hairline gap
+	// otherwise row neighbours differ by a subpixel and leave a hairline gap.
+	// Not in the gallery: images are shown alone there, keep exact proportions
 	/** @param {number | undefined} ratio */
-	const snap = (ratio) => (ratio ? Math.round(ratio * 100) / 100 : ratio)
+	const snap = (ratio) => (ratio && !isGallery ? Math.round(ratio * 100) / 100 : ratio)
 
 	const aspectRatio = $derived(snap(media?.type === 'video' ? media?.posterAspectRatio : media?.aspectRatio))
 	const aspectRatioMobile = $derived(snap(media?.type === 'video' ? media?.posterAspectRatio : media?.aspectRatioMobile || media?.aspectRatio))
@@ -72,7 +73,7 @@
 >
 	<div class="content" class:opacity class:loaded={loaded && entered}>
 		{#if media?.type === 'video' && media.video}
-			<video autoplay muted loop playsinline class:blur class:scale class:loaded={loaded && entered} poster={safely(() => urlFor(media.videoPoster)?.url())} onloadeddata={() => (loaded = true)} {@attach ensureAutoplay}>
+			<video autoplay muted loop playsinline aria-label={media.videoPoster?.alt || undefined} class:blur class:scale class:loaded={loaded && entered} poster={safely(() => urlFor(media.videoPoster)?.url())} onloadeddata={() => (loaded = true)} {@attach ensureAutoplay}>
 				{#if media.videoMobile}
 					<source media="(max-width: 768px)" src={media.videoMobile.asset?.url} type="video/mp4" />
 				{/if}
@@ -87,8 +88,9 @@
 					src={safely(() => (isGallery ? urlFor(media.image)?.height(1200).url() : urlFor(media.image)?.width(1200).url()))}
 					srcset={srcset(media.image)}
 					{sizes}
-					loading="lazy"
-					alt=""
+					loading={eager ? 'eager' : 'lazy'}
+					fetchpriority={eager ? 'high' : undefined}
+					alt={media.image.alt || ''}
 					class:blur
 					class:scale
 					class:loaded={loaded && entered}
@@ -144,7 +146,17 @@
 			&.blur {
 				filter: blur(20px);
 
+				@media (pointer: coarse) {
+					filter: blur(8px);
+				}
+
 				&.loaded {
+					filter: none;
+				}
+
+				// low-end devices (html.lite, set in app.html): skip the blur-in,
+				// the opacity fade is enough
+				:global(html.lite) & {
 					filter: none;
 				}
 			}
@@ -175,7 +187,7 @@
 
 			@media (width <= #{bp.$md}) {
 				width: min(calc(100vw - var(--sp-15) * 2 - var(--sp-10) * 2), calc((100vh - var(--sp-15) * 8) * var(--aspect-ratio-mobile, 1)));
-				height: min(calc(100vh - var(--sp-15) * 8), calc((100vw - var(--sp-15) * 2) / var(--aspect-ratio-mobile, 1)));
+				height: min(calc(100vh - var(--sp-15) * 8), calc((100vw - var(--sp-15) * 2 - var(--sp-10) * 2) / var(--aspect-ratio-mobile, 1)));
 			}
 		}
 	}

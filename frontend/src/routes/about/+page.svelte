@@ -32,28 +32,34 @@
 	{#if data.about.capabilities?.length || data.about.commissions?.length || data.about.clients?.length}
 		<div class="info">
 			{#if data.about.capabilities?.length}
-				<ul class="capabilities">
+				<div class="capabilities">
 					<h2 class="title">Capabilities</h2>
-					{#each data.about.capabilities as capability (capability._key)}
-						<li class="capability">{capability.title}</li>
-					{/each}
-				</ul>
+					<ul>
+						{#each data.about.capabilities as capability (capability._key)}
+							<li class="capability">{capability.title}</li>
+						{/each}
+					</ul>
+				</div>
 			{/if}
 			{#if data.about.clients?.length}
-				<ul class="clients">
+				<div class="clients">
 					<h2 class="title">Clients</h2>
-					{#each data.about.clients as clientRef (clientRef._key)}
-						<li class="client">{clientRef.title}</li>
-					{/each}
-				</ul>
+					<ul>
+						{#each data.about.clients as clientRef (clientRef._key)}
+							<li class="client">{clientRef.title}</li>
+						{/each}
+					</ul>
+				</div>
 			{/if}
 			{#if data.about.commissions?.length}
-				<ul class="commissions">
+				<div class="commissions">
 					<h2 class="title">Commissions and General Enquiries</h2>
-					{#each data.about.commissions as commission (commission._key)}
-						<li class="commission"><a class="hover-gray" href={commission.href}>{commission.label}</a></li>
-					{/each}
-				</ul>
+					<ul>
+						{#each data.about.commissions as commission (commission._key)}
+							<li class="commission"><a class="hover-gray" href={commission.href}>{commission.label}</a></li>
+						{/each}
+					</ul>
+				</div>
 			{/if}
 		</div>
 	{/if}
@@ -69,8 +75,8 @@
 		</ul>
 	{/if}
 	<div class="disclaimer">
-		<p class="permission">Contents may not be reproduced without the permission of All Vibile Objects.</p>
-		<p class="copyright">© {new Date().getFullYear()} All Visible Object</p>
+		<p class="permission">Contents may not be reproduced without the permission of All Visible Objects.</p>
+		<p class="copyright">© {new Date().getFullYear()} All Visible Objects</p>
 	</div>
 </article>
 

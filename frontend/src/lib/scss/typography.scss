@@ -1,7 +1,7 @@
 @use 'breakpoints.module' as bp;
 @font-face {
   font-family: "SuisseIntl";
-  src: url("$lib/assets/fonts/SuisseIntl-SemiBold.otf") format("opentype");
+  src: url("$lib/assets/fonts/SuisseIntl-SemiBold.woff2") format("woff2");
   font-weight: 600;
   font-style: normal;
   font-display: block;

@@ -4,6 +4,7 @@
 	import { useScrollLock } from '$lib/utils/scrollLock.svelte.js'
 	import { revealWidth } from '$lib/utils/transitions.js'
 	import { getGallery } from '$lib/stores/gallery.svelte.js'
+	import { preloadGalleryImage } from '$lib/utils/image.js'
 
 	const DURATION = 300
 	const IDLE_DELAY = 10000
@@ -63,6 +64,24 @@
 		}
 	})
 
+	// next two + previous image, so stepping through never waits on a download
+	$effect(() => {
+		for (const offset of [1, 2, -1]) {
+			preloadGalleryImage(media[(index + offset + media.length) % media.length], 'high')
+		}
+	})
+
+	// a11y: move focus into the dialog on open, give it back to whatever
+	// opened it (the clicked image) on close
+	/** @param {HTMLElement} node */
+	function manageFocus(node) {
+		const previous = document.activeElement
+		node.focus({ preventScroll: true })
+		return () => {
+			if (previous instanceof HTMLElement && previous.isConnected) previous.focus({ preventScroll: true })
+		}
+	}
+
 	/** @param {KeyboardEvent} e */
 	function handleKeydown(e) {
 		if (e.key === 'Escape') close()
@@ -73,7 +92,7 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-<div class="overlay" role="dialog" aria-modal="true" aria-label="Media gallery">
+<div class="overlay" role="dialog" aria-modal="true" aria-label="Media gallery" tabindex="-1" {@attach manageFocus}>
 	<div class="tag-wrapper index" in:revealWidth|global={{ duration: DURATION, delay: DURATION }} out:revealWidth|global={{ duration: DURATION }}>
 		<span class="tag no-pointer">{index + 1}/{media.length}</span>
 	</div>
@@ -115,6 +134,7 @@
 		align-items: center;
 		justify-content: center;
 		background-color: var(--white);
+		outline: none; // focused programmatically for a11y, never shows a ring
 
 		.index {
 			position: absolute;

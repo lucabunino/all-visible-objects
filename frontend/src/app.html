@@ -10,6 +10,8 @@
 		<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
 		<meta name="apple-mobile-web-app-title" content="All Visible Objects" />
 		<link rel="manifest" href="/favicon/site.webmanifest" />
+		<!-- low-end devices (≤4GB RAM, Chromium only) skip heavy blur effects -->
+		<script>if ((navigator.deviceMemory || 8) <= 4) document.documentElement.classList.add('lite')</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

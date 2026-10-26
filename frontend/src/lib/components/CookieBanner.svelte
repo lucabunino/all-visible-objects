@@ -49,7 +49,7 @@
 		padding: var(--sp-8);
 		color: var(--white);
 		background-color: var(--gray);
-		backdrop-filter: blur(var(--sp-20));
+		backdrop-filter: blur(var(--blur));
 		isolation: isolate;
 		mix-blend-mode: normal;
 		will-change: backdrop-filter, transform;

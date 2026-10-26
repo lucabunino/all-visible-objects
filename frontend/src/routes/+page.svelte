@@ -1,34 +1,21 @@
 <script>
 	import Media from '$lib/components/Media.svelte'
-	import { revealWidth } from '$lib/utils/transitions.js'
 
 	let { data } = $props()
-
-	const DURATION = 200
-
-	/** @type {string | null | undefined} */
-	let hoveredId = $state(null)
 </script>
 
-<h1 class="sr-only">All Visible Object</h1>
+<h1 class="sr-only">All Visible Objects</h1>
 
-<ul class="works">
-	{#each data.works as work (work._id)}
+<!-- project page JS loads once a tile is visible; data still preloads on hover/touch (app.html) -->
+<ul class="works" data-sveltekit-preload-code="viewport">
+	{#each data.works as work, i (work._id)}
 		<li class="work">
-			<a
-				href="/works/{work.client?.slug?.current}/{work.slug?.current}"
-				onmouseenter={() => (hoveredId = work._id)}
-				onmouseleave={() => (hoveredId = null)}
-				onfocus={() => (hoveredId = work._id)}
-				onblur={() => (hoveredId = null)}
-			>
-				<Media media={work.thumbnail} class="homepage" width={50}/>
+			<a href="/works/{work.client?.slug?.current}/{work.slug?.current}">
+				<!-- first row is above the fold: load eagerly for a faster LCP -->
+				<Media media={work.thumbnail} class="homepage" width={50} eager={i < 2}/>
 				<div class="tags">
 					<span class="tag client">{work.client ? work.client.title : 'Missing client'}</span>
 					<span class="tag title">{work.title}</span>
-					<!-- {#if hoveredId === work._id}
-						<span class="tag view black" in:revealWidth={{ duration: DURATION }} out:revealWidth={{ duration: DURATION }}>View project</span>
-					{/if} -->
 				</div>
 			</a>
 		</li>

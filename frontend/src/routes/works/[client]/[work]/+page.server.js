@@ -5,7 +5,7 @@ export async function load({ params }) {
 	const work = await getWork(params.client, params.work)
 	if (!work) error(404, 'Work not found')
 
-	const hidden = work.status === 'hidden' || work.clientStatus === 'hidden'
+	const hidden = work.status === 'hidden' || work.client?.status === 'hidden'
 
 	return {
 		work,

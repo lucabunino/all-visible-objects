@@ -9,8 +9,6 @@
 </article>
 
 <style lang="scss">
-	@use '$lib/scss/breakpoints.module' as bp;
-
 	article {
 		padding: calc(var(--tagHeight) + var(--sp-15)*3) var(--sp-15);
 
@@ -21,8 +19,5 @@
 		.tag {
 			margin-top: var(--sp-10);
 		}
-	}
-
-	@media (width <= #{bp.$md}) {
 	}
 </style>

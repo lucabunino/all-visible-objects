@@ -19,6 +19,11 @@
 	--transition-s: var(--ease-out) .3s;
 	--transition-xs: var(--ease-out) .2s;
 	--transition-tag: var(--ease-in-out) .3s;
+	// backdrop blur on tags — blur cost grows with radius, so touch devices get less
+	--blur: var(--sp-20);
+	@media (pointer: coarse) {
+		--blur: var(--sp-10);
+	}
 
 	@for $i from 1 through 200 {
 		--sp-#{$i}: #{calc($i / 14)}rem;
@@ -32,6 +37,18 @@
 
 html {
 	overscroll-behavior-x: none;
+}
+
+// prefers-reduced-motion: CSS transitions/animations become instant (custom
+// Svelte transitions handle it in transitions.js)
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		transition-duration: 0s !important;
+		animation-duration: 0s !important;
+		scroll-behavior: auto !important;
+	}
 }
 
 body {
@@ -68,7 +85,7 @@ body {
 	display: inline-block;
 	color: var(--white);
 	background-color: var(--gray);
-	backdrop-filter: blur(var(--sp-20));
+	backdrop-filter: blur(var(--blur));
 	padding: var(--sp-8);
 	line-height: 1cap;
 	isolation: isolate;

@@ -8,14 +8,14 @@
 	import HeaderWork from '$lib/components/HeaderWork.svelte'
 	import Footer from '$lib/components/Footer.svelte'
 	import CookieBanner from '$lib/components/CookieBanner.svelte'
-	import { pageIn, pageOut } from '$lib/utils/transitions.js'
+	import { pageIn, pageOut, PAGE_DURATION } from '$lib/utils/transitions.js'
 	import { getTemplate } from '$lib/utils/template.js'
 	import { page } from '$app/state'
 	import { innerWidth } from 'svelte/reactivity/window'
 	import bp from '$lib/scss/breakpoints.module.scss'
 
 	let { data, children } = $props()
-	const DURATION = 500
+	const DURATION = PAGE_DURATION
 </script>
 
 {#if innerWidth.current && innerWidth.current <= parseInt(bp.xxxs)}
@@ -41,8 +41,6 @@
 {/if}
 
 <style lang="scss">
-	@use '$lib/scss/breakpoints.module' as bp;
-
 	.page {
 		display: flex;
 		flex-direction: column;
@@ -57,8 +55,5 @@
 		text-align: center;
 		min-height: 100vh;
 		padding: var(--sp-15);
-	}
-
-	@media (width <= #{bp.$md}) {
 	}
 </style>

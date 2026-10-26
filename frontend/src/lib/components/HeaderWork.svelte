@@ -1,9 +1,10 @@
 <script>
 	import { tick } from 'svelte'
 	import { page } from '$app/state'
+	import { afterNavigate, beforeNavigate } from '$app/navigation'
 	import { browser } from '$app/environment'
 	import { getTemplate } from '$lib/utils/template'
-	import { revealWidth } from '$lib/utils/transitions.js'
+	import { revealWidth, PAGE_DURATION } from '$lib/utils/transitions.js'
 	import { getGallery } from '$lib/stores/gallery.svelte.js'
 	import { innerWidth } from 'svelte/reactivity/window'
 	import bp from '$lib/scss/breakpoints.module.scss'
@@ -12,6 +13,8 @@
 
 	const DURATION = 300
 	const STEP = 50
+	const TAG_STEP = 0 // stagger between top-level tags
+	const TAG_DELAY = PAGE_DURATION // top-level tags reveal once the page transition is done
 	const OPEN_DELAY = 150
 
 	const gallery = getGallery()
@@ -20,11 +23,6 @@
 
 	const isWork = $derived(getTemplate(page.route.id) === 'work')
 	const work = $derived(page.data.work)
-	const galleryMedia = $derived(
-		/** @type {any[]} */ (work?.blocks ?? [])
-			.flatMap((/** @type {any} */ block) => block.items ?? [])
-			.filter((/** @type {any} */ item) => item._type === 'mediaItem')
-	)
 
 	// ---- client dropdown: trimmed single-level copy of Header's Works menu ----
 
@@ -33,8 +31,6 @@
 	let clientOpen = $state(false)
 	/** @type {HTMLElement | undefined} */
 	let headerMenuEl = $state()
-	/** @type {HTMLElement | undefined} */
-	let clientWrapperEl = $state()
 	/** @type {HTMLButtonElement | undefined} */
 	let clientButtonEl = $state()
 	/** @type {HTMLAnchorElement[]} */
@@ -43,9 +39,32 @@
 	/** @type {ReturnType<typeof setTimeout>} */
 	let openTimeout
 
+	// immediate tap feedback, see Header.svelte's `pressed`
+	/** @type {string | null | undefined} */
+	let pressed = $state(null)
+
+	// see Header.svelte's `leaving`: instant tag outros on page change
+	let leaving = $state(false)
+	beforeNavigate(({ to, willUnload }) => {
+		if (to?.route.id && !willUnload) leaving = true
+	})
+	afterNavigate(() => {
+		pressed = null
+		tick().then(() => (leaving = false))
+	})
+
 	function closeClient() {
 		clearTimeout(openTimeout)
 		clientOpen = false
+		pressed = null
+	}
+
+	// mobile: tap toggles (hover/focus opening is desktop-only — Safari doesn't
+	// focus buttons on tap, and emulated mouseenter can't toggle closed)
+	function toggleClient() {
+		if (clientOpen) closeClient()
+		else clientOpen = true
+		pressed = null
 	}
 
 	function openClientHover() {
@@ -140,10 +159,13 @@
 					{#each navClient.works as sibling, i (sibling.slug?.current)}
 						<li class="work tag-wrapper"
 						in:revealWidth|global={{ duration: DURATION, delay: i * STEP }}
-						out:revealWidth|global={{ duration: DURATION }}>
+						out:revealWidth|global={{ duration: leaving ? 0 : DURATION }}>
 							<a class="tag" href="/works/{navClient.slug?.current}/{sibling.slug?.current}"
 							bind:this={siblingRefs[i]}
-							class:active={sibling.slug?.current === page.params.work}
+							class:active={sibling.slug?.current === page.params.work || pressed === `work:${sibling.slug?.current}`}
+							onpointerdown={() => (pressed = `work:${sibling.slug?.current}`)}
+							onpointercancel={() => (pressed = null)}
+							onclick={() => (pressed = `work:${sibling.slug?.current}`)}
 							aria-current={sibling.slug?.current === page.params.work ? 'page' : undefined}
 							onkeydown={(e) => handleSiblingKeydown(e, i)}
 							>{sibling.title}</a>
@@ -153,7 +175,7 @@
 						<li class="work tag-wrapper">
 							<button class="tag" type="button" aria-label="Close" onclick={closeClient}
 							in:revealWidth|global={{ duration: DURATION, delay: navClient.works.length * STEP }}
-							out:revealWidth|global={{ duration: DURATION }}
+							out:revealWidth|global={{ duration: leaving ? 0 : DURATION }}
 							>× Close</button>
 						</li>
 					{/if}
@@ -165,34 +187,32 @@
 	<header>
 		<div class="menu" role="menubar" tabindex="-1" bind:this={headerMenuEl} onkeydown={handleTopLevelKeydown}>
 			{#if navClient && !gallery.open}
-				<div id="client" class="menu-item tag-wrapper" role="none" bind:this={clientWrapperEl} onmouseenter={openClientHover} onmouseleave={closeClient} onfocusin={openClientHover} onfocusout={handleClientFocusOut}
-				in:revealWidth|global={{ duration: DURATION, delay: DURATION }} out:revealWidth|global={{ duration: DURATION }}>
-					<h2><button class="tag no-pointer" class:active={clientOpen} type="button" bind:this={clientButtonEl} onkeydown={handleClientKeydown} aria-haspopup="true" aria-expanded={clientOpen} aria-controls="clientWorks">{navClient.title}</button></h2>
+				<div id="client" class="menu-item tag-wrapper" role="none"
+				onmouseenter={isMobile ? undefined : openClientHover}
+				onmouseleave={isMobile ? undefined : closeClient}
+				onfocusin={isMobile ? undefined : openClientHover}
+				onfocusout={isMobile ? undefined : handleClientFocusOut}
+				in:revealWidth|global={{ duration: DURATION, delay: TAG_DELAY }} out:revealWidth|global={{ duration: leaving ? 0 : DURATION }}>
+					<h2><button class="tag" class:no-pointer={!isMobile} class:active={clientOpen || pressed === 'client'} type="button" bind:this={clientButtonEl}
+				onpointerdown={isMobile ? () => (pressed = 'client') : undefined}
+				onpointercancel={() => (pressed = null)}
+				onclick={isMobile ? toggleClient : undefined} onkeydown={handleClientKeydown} aria-haspopup="true" aria-expanded={clientOpen} aria-controls="clientWorks">{navClient.title}</button></h2>
 					{@render clientDropdown()}
 				</div>
 			{/if}
 			{#key page.params.work}
 				{#if work.title && !gallery.open}
-					<div class="tag-wrapper title" in:revealWidth|global={{ duration: DURATION, delay: DURATION+STEP*1 }} out:revealWidth|global={{ duration: DURATION }}>
+					<div class="tag-wrapper title" in:revealWidth|global={{ duration: DURATION, delay: TAG_DELAY+TAG_STEP*1 }} out:revealWidth|global={{ duration: leaving ? 0 : DURATION }}>
 						<h1 class="tag no-pointer">{work.title}</h1>
 					</div>
 				{/if}
 			{/key}
 			{#if !gallery.open}
-				<div class="tag-wrapper details" in:revealWidth|global={{ duration: DURATION, delay: DURATION+STEP*2 }} out:revealWidth|global={{ duration: DURATION }}>
+				<div class="tag-wrapper details" in:revealWidth|global={{ duration: DURATION, delay: TAG_DELAY+TAG_STEP*2 }} out:revealWidth|global={{ duration: leaving ? 0 : DURATION }}>
 					<a href="#details" class="tag black" onclick={scrollToDetails}>Details +</a>
 				</div>
 			{/if}
-			<!-- {#if galleryMedia.length && !gallery.open}
-				<div class="tag-wrapper" in:revealWidth|global={{ duration: DURATION, delay: DURATION }} out:revealWidth|global={{ duration: DURATION }}>
-					<button class="tag play" type="button" onclick={() => gallery.openGallery()}>Play
-						<svg width="10" height="11" viewBox="0 0 10 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<path d="M9.75 5.19615L4.64275e-07 10.3923L9.18537e-07 -9.03023e-07L9.75 5.19615Z"/>
-						</svg>
-					</button>
-				</div>
-			{/if} -->
-			<div class="tag-wrapper close" in:revealWidth|global={{ duration: DURATION, delay: DURATION }} out:revealWidth|global={{ duration: DURATION }}>
+			<div class="tag-wrapper close" in:revealWidth|global={{ duration: DURATION, delay: TAG_DELAY+TAG_STEP*3 }} out:revealWidth|global={{ duration: leaving ? 0 : DURATION }}>
 				<a class="tag" href="/" onclick={handleCloseClick} aria-label={gallery.open ? 'Close gallery' : 'Close'}>Close</a>
 			</div>
 		</div>
@@ -231,8 +251,7 @@
 
 			#client {
 				pointer-events: all;
-				flex-shrink: 1;
-				min-width: 0;
+				flex-shrink: 0;
 
 				#clientWorks {
 					position: relative;
@@ -253,20 +272,19 @@
 				}
 			}
 
-			.close {
-				position: fixed;
-				top: var(--sp-15);
-				right: var(--sp-15);
-				z-index: 101;
+			// in the flex row (not fixed) so the title shrinks + ellipsizes before
+			// reaching it. Pushed right by a growing spacer, not margin-left: auto —
+			// revealWidth animates the measured margin, so auto made Close slide in
+			&::before {
+				content: '';
+				order: 1;
+				flex: 1 1 0;
 			}
 
-			.play {
-				display: flex;
-				column-gap: var(--sp-7);
-
-				svg {
-					fill: var(--white);
-				}
+			.close {
+				position: relative;
+				z-index: 101;
+				order: 2;
 			}
 		}
 

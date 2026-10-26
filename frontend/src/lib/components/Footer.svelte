@@ -10,7 +10,7 @@
 		<a class="talk tag" href="mailto:{about.email}">A new project in mind? Let’s talk.</a>
 	{/if}
 	<div class="footer">
-		<p class="year">© {new Date().getFullYear()} All Visible Object</p>
+		<p class="year">© {new Date().getFullYear()} All Visible Objects</p>
 		{#if about.instagram?.href}
 			<a class="instagram tag black" href={about.instagram.href} target="_blank" rel="noopener noreferrer">{about.instagram.handle}</a>
 		{/if}

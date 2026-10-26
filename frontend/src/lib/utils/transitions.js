@@ -26,6 +26,18 @@ function cubicBezier(mX1, mY1, mX2, mY2) {
 	return (x) => calcBezier(getTForX(x), mY1, mY2)
 }
 
+// page in/out duration (+layout.svelte) — header tags wait this long before
+// revealing, so tag and page animations don't run in the same frames
+export const PAGE_DURATION = 500
+
+// prefers-reduced-motion: every custom transition becomes instant
+const reduceMotion = browser && matchMedia('(prefers-reduced-motion: reduce)').matches
+
+/** @param {number} duration @param {number} delay */
+function timing(duration, delay) {
+	return reduceMotion ? { duration: 0, delay: 0 } : { duration, delay }
+}
+
 // matches --transition: cubic-bezier(0.42, 0, 0.58, 1) in main.scss
 const transitionEasing = cubicBezier(0.42, 0, 0.58, 1)
 
@@ -40,13 +52,28 @@ export function revealWidth(node, { duration = 300, delay = 0, easing = transiti
 	const paddingRight = parseFloat(style.paddingRight) || 0
 	const marginLeft = parseFloat(style.marginLeft) || 0
 	return {
-		duration,
-		delay,
+		...timing(duration, delay),
 		easing,
+		// Safari <18 ignores overflow set via animation keyframes, so during an
+		// intro's delay the zero-width wrapper didn't clip its tag and it flashed at
+		// full size — hide it at t=0 only. Not clip-path/opacity: those make the
+		// wrapper a backdrop root and the tag's backdrop blur vanishes mid-reveal
 		/** @param {number} t */
 		css: (t) =>
-			`width: ${t * width}px; margin-left: ${t * marginLeft}px; padding-left: ${t * paddingLeft}px; padding-right: ${t * paddingRight}px; overflow: hidden;`
+			`width: ${t * width}px; margin-left: ${t * marginLeft}px; padding-left: ${t * paddingLeft}px; padding-right: ${t * paddingRight}px; overflow: hidden;${t === 0 ? ' visibility: hidden;' : ''}`
 	}
+}
+
+// full-element blur is the heaviest part of a transition (and page transitions
+// blur two whole pages at once) — low-end devices (html.lite, set in app.html)
+// get the fade without it
+const noBlur = !browser || document.documentElement.classList.contains('lite')
+// blur cost grows with radius — touch devices that keep it get a third of it
+const blurScale = browser && matchMedia('(pointer: coarse)').matches ? 0.3 : 1
+
+/** @param {number} t @param {number} blur */
+function blurCss(t, blur) {
+	return noBlur ? '' : `filter: blur(${(1 - t) * blur * blurScale}px);`
 }
 
 /**
@@ -55,11 +82,10 @@ export function revealWidth(node, { duration = 300, delay = 0, easing = transiti
  */
 export function fadeBlur(node, { duration = 500, delay = 0, blur = 100, easing = transitionEasing } = {}) {
 	return {
-		duration,
-		delay,
+		...timing(duration, delay),
 		easing,
 		/** @param {number} t */
-		css: (t) => `opacity: ${t}; filter: blur(${(1 - t) * blur}px);`
+		css: (t) => `opacity: ${t}; ${blurCss(t, blur)}`
 	}
 }
 
@@ -70,11 +96,10 @@ export function fadeBlur(node, { duration = 500, delay = 0, blur = 100, easing =
 export function pageIn(node, { duration = 500, delay = 0, blur = 100, easing = transitionEasing, fixed = false } = {}) {
 	const position = fixed ? 'position: fixed; inset: 0;' : 'position: absolute; inset: 0;'
 	return {
-		duration,
-		delay,
+		...timing(duration, delay),
 		easing,
 		/** @param {number} t */
-		css: (t) => `${position} opacity: ${t}; filter: blur(${(1 - t) * blur}px);`
+		css: (t) => `${position} opacity: ${t}; ${blurCss(t, blur)}`
 	}
 }
 
@@ -88,10 +113,9 @@ export function pageOut(node, { duration = 500, delay = 0, blur = 100, easing = 
 		? 'position: fixed; inset: 0;'
 		: `position: fixed; top: ${-scrollY}px; left: 0; right: 0;`
 	return {
-		duration,
-		delay,
+		...timing(duration, delay),
 		easing,
 		/** @param {number} t */
-		css: (t) => `${position} opacity: ${t}; filter: blur(${(1 - t) * blur}px);`
+		css: (t) => `${position} opacity: ${t}; ${blurCss(t, blur)}`
 	}
 }

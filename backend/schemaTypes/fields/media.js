@@ -1,3 +1,10 @@
+const alt = {
+	name: 'alt',
+	title: 'Alt text',
+	description: 'Short description of the image for screen readers and search engines',
+	type: 'string',
+}
+
 export const mediaFields = [
 	{
 		name: 'type',
@@ -14,6 +21,7 @@ export const mediaFields = [
 	{
 		name: 'image',
 		type: 'image',
+		fields: [alt],
 		hidden: ({parent}) => parent?.type !== 'image',
 		validation: Rule =>
 			Rule.custom((v, c) => (c.parent.type === 'image' && !v ? 'Required' : true)),
@@ -44,6 +52,7 @@ export const mediaFields = [
 	{
 		name: 'videoPoster',
 		type: 'image',
+		fields: [{...alt, description: 'Short description of the video for screen readers and search engines'}],
 		hidden: ({parent}) => parent?.type !== 'video',
 		validation: Rule =>
 			Rule.custom((v, c) => (c.parent.type === 'video' && !v ? 'Required' : true)),

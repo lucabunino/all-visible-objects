@@ -5,7 +5,7 @@
 	import Gallery from '$lib/components/Gallery.svelte'
 	import { pageIn, pageOut } from '$lib/utils/transitions.js'
 	import { getGallery } from '$lib/stores/gallery.svelte.js'
-	import { urlFor, gallerySrcset, gallerySizes } from '$lib/utils/image.js'
+	import { preloadGalleryImage } from '$lib/utils/image.js'
 	import { page } from '$app/state'
 
 	let { data } = $props()
@@ -22,29 +22,29 @@
 			.filter((/** @type {any} */ item) => item._type === 'mediaItem')
 	)
 
-	/** @param {() => string | undefined} fn */
-	function safely(fn) {
-		try {
-			return fn()
-		} catch {
-			return undefined
+	// gallery images are warmed one at a time, at low priority, only once the
+	// page itself has fully loaded and the browser is idle — so they never
+	// compete with the visible page. The gallery preloads neighbours as you go.
+	$effect(() => {
+		const items = galleryMedia
+		let cancelled = false
+		/** @param {() => void} fn */
+		const idle = (fn) => ('requestIdleCallback' in window ? requestIdleCallback(fn) : setTimeout(fn, 200))
+		async function warm() {
+			for (const item of items) {
+				if (cancelled) return
+				await preloadGalleryImage(item, 'low')
+			}
 		}
-	}
+		const start = () => idle(() => warm())
+		if (document.readyState === 'complete') start()
+		else window.addEventListener('load', start, { once: true })
+		return () => {
+			cancelled = true
+			window.removeEventListener('load', start)
+		}
+	})
 </script>
-
-<svelte:head>
-	{#each galleryMedia as item (item._key)}
-		{#if item.image}
-			<link
-				rel="preload"
-				as="image"
-				href={safely(() => urlFor(item.image)?.height(1200).url())}
-				imagesrcset={gallerySrcset(item.image, item.aspectRatio || 1)}
-				imagesizes={gallerySizes()}
-			/>
-		{/if}
-	{/each}
-</svelte:head>
 
 {#if gallery.open && galleryMedia.length}
 	<div class="gallery-wrapper" in:pageIn={{ fixed: true, duration: DURATION }} out:pageOut={{ fixed: true, duration: DURATION}}>
@@ -99,9 +99,7 @@
 			{#if data.work.services?.length}
 				<dt>Services</dt>
 				<dd>
-					{#each data.work.services as service, i}
-						{#if i > 0}{@html ', '}{/if}{service.title}
-					{/each}
+					{data.work.services.map((/** @type {any} */ service) => service.title).join(', ')}
 				</dd>
 			{/if}
 			{#if data.work.credits?.length}
@@ -109,7 +107,7 @@
 					<dt>{credit.role}</dt>
 					<dd>
 						{#each credit.collaborators as collaborator, i}
-							{#if i > 0}{@html ', '}{/if}
+							{#if i > 0}, {/if}
 							{#if collaborator.href}
 								<a class="hover-gray" href={collaborator.href} target="_blank" rel="noopener noreferrer">{collaborator.title}</a>
 							{:else}
