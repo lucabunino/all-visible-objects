@@ -176,6 +176,7 @@
 
 		&.gallery {
 			display: inline-block;
+			border-radius: 3px;
 			width: min(calc(100vw - var(--sp-15) * 2), calc((100vh - var(--sp-15) * 8) * var(--aspect-ratio, 1)));
 			height: min(calc(100vh - var(--sp-15) * 8), calc((100vw - var(--sp-15) * 2) / var(--aspect-ratio, 1)));
 

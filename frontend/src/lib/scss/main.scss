@@ -19,11 +19,10 @@
 	--transition-s: var(--ease-out) .3s;
 	--transition-xs: var(--ease-out) .2s;
 	--transition-tag: var(--ease-in-out) .3s;
-	// backdrop blur on tags — blur cost grows with radius, so touch devices get less
-	--blur: var(--sp-20);
-	@media (pointer: coarse) {
-		--blur: var(--sp-10);
-	}
+	// tag/button glass: background + backdrop blur (small radius, cheap enough
+	// for touch devices too)
+	--tagBg: rgb(0 0 0 / .2);
+	--blur: 9px;
 
 	@for $i from 1 through 200 {
 		--sp-#{$i}: #{calc($i / 14)}rem;
@@ -84,7 +83,7 @@ body {
 .tag:any-link {
 	display: inline-block;
 	color: var(--white);
-	background-color: var(--gray);
+	background-color: var(--tagBg);
 	backdrop-filter: blur(var(--blur));
 	padding: var(--sp-8);
 	line-height: 1cap;
@@ -127,18 +126,18 @@ body {
 	&.black {
 		background-color: var(--black);
 		&.active {
-			background-color: var(--gray);
+			background-color: var(--tagBg);
 			opacity: 1;
 		}
 		@media (pointer: fine) {&:not(.no-pointer):hover {
-			background-color: var(--gray);
+			background-color: var(--tagBg);
 			opacity: 1;
 		}}
 
 		&:focus-visible {
 			outline-width: 1px;
 			outline-offset: 0;
-			background-color: var(--gray);
+			background-color: var(--tagBg);
 			opacity: 1;
 		}
 	}
