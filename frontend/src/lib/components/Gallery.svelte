@@ -82,15 +82,19 @@
 		}
 	}
 
+	// keyboard use hides the cursor arrow tag until the mouse moves again
+	let usingKeyboard = $state(false)
+
 	/** @param {KeyboardEvent} e */
 	function handleKeydown(e) {
+		usingKeyboard = true
 		if (e.key === 'Escape') close()
 		else if (e.key === 'ArrowLeft') handlePrev()
 		else if (e.key === 'ArrowRight') handleNext()
 	}
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
+<svelte:window onkeydown={handleKeydown} onmousemove={() => (usingKeyboard = false)} />
 
 <div class="overlay" role="dialog" aria-modal="true" aria-label="Media gallery" tabindex="-1" {@attach manageFocus}>
 	<div class="tag-wrapper index" in:revealWidth|global={{ duration: DURATION, delay: DURATION }} out:revealWidth|global={{ duration: DURATION }}>
@@ -119,7 +123,7 @@
 	{/key}
 </div>
 
-{#if hovered}
+{#if hovered && !usingKeyboard}
 	<CursorTag direction={hovered} />
 {/if}
 

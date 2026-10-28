@@ -3,7 +3,6 @@ import {
 	HomeIcon,
 	InfoOutlineIcon,
 	AccessDeniedIcon,
-	RobotIcon,
 	SparklesIcon,
 	CaseIcon,
 	ProjectsIcon,
@@ -40,10 +39,6 @@ export const myStructure = (S, context) => {
 			.title('Privacy')
 			.icon(AccessDeniedIcon)
 			.child(S.document().schemaType('policy').documentId('privacy')),
-		S.listItem()
-			.title('Cookies')
-			.icon(RobotIcon)
-			.child(S.document().schemaType('policy').documentId('cookies')),
 	]
 
 	return S.list()

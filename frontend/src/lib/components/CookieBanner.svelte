@@ -17,7 +17,6 @@
 		visible = false
 	}
 
-	const cookiesPolicy = $derived(policies.find((p) => p._id === 'cookies'))
 	const privacyPolicy = $derived(policies.find((p) => p._id === 'privacy'))
 </script>
 
@@ -25,10 +24,7 @@
 	<div id="cookie-banner" role="dialog" aria-label="Cookie consent" aria-modal="false" in:fly={{ y: 20, duration: 400 }}>
 		<p>
 			This website uses only technical cookies, which are necessary for its proper functioning. No profiling or third-party cookies are used. For more details, please consult our
-			{#if cookiesPolicy}<a href="/policy/{cookiesPolicy.slug?.current}">cookies</a>{:else}cookies{/if}
-			and
-			{#if privacyPolicy}<a href="/policy/{privacyPolicy.slug?.current}">privacy</a>{:else}privacy{/if}
-			policies.
+			{#if privacyPolicy}<a href="/policy/{privacyPolicy.slug?.current}">privacy policy</a>{:else}privacy policy{/if}.
 		</p>
 		<button class="tag black" type="button" onclick={accept}>Ok, I understand</button>
 	</div>

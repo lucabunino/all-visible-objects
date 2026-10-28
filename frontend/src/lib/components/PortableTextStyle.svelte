@@ -37,9 +37,23 @@ levels don't skip (h3 → h6) for screen readers; looks are class-driven -->
 	list-style: disc;
 	padding: 0 1em;
 }
+// left-aligned numbers in a fixed two-digit slot (1. … 10. all start on the
+// same edge), instead of the default right-aligned markers
 :global(.portableText ol) {
-	list-style: decimal;
-	padding: 0 1em;
+	list-style: none;
+	counter-reset: item;
+	padding: 0;
+}
+:global(.portableText ol > li) {
+	counter-increment: item;
+	position: relative;
+	padding-left: 2.2em;
+}
+:global(.portableText ol > li::before) {
+	content: counter(item) '.';
+	position: absolute;
+	left: 0;
+	font-variant-numeric: tabular-nums;
 }
 :global([data-template="policy"] .portableText h4 + *),
 :global([data-template="policy"] .portableText h3 + *),
