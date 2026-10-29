@@ -94,7 +94,7 @@ article {
 	color: var(--black);
 
 	.title {
-		color: var(--gray-light);
+		color: var(--gray);
 		margin-bottom: var(--sp-4);
 	}
 
@@ -148,7 +148,7 @@ article {
 	.disclaimer {
 		grid-column: 17 / span 8;
 		margin-top: auto;
-		color: var(--gray-light);
+		color: var(--gray);
 		
 		p {
 			display: inline;

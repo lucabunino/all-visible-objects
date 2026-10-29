@@ -109,7 +109,8 @@
 		position: relative;
 		overflow: hidden;
 		isolation: isolate;
-		background-color: var(--gray-subtle);		aspect-ratio: var(--aspect-ratio, 1);
+		background-color: var(--gray-subtle);
+		aspect-ratio: var(--aspect-ratio, 1);
 
 		.content {
 			position: absolute;

@@ -3,6 +3,7 @@
 	import PortableTextStyle from '$lib/components/PortableTextStyle.svelte'
 	import Media from '$lib/components/Media.svelte'
 	import Gallery from '$lib/components/Gallery.svelte'
+	import Footer from '$lib/components/Footer.svelte'
 	import { pageIn, pageOut } from '$lib/utils/transitions.js'
 	import { getGallery } from '$lib/stores/gallery.svelte.js'
 	import { preloadGalleryImage } from '$lib/utils/image.js'
@@ -128,6 +129,12 @@
 		{/if}
 	</section>
 
+</article>
+
+<!-- related + footer fill at least one viewport (minus header), with the
+"Let's talk" gap absorbing the rest: at the bottom of the page the related
+heading lands just under the fixed header, whatever the block heights -->
+<div class="tail">
 	{#if data.work.related?.length}
 		<nav id="related" aria-label="Related works">
 			<h3>More projects to explore</h3>
@@ -144,7 +151,8 @@
 			</ul>
 		</nav>
 	{/if}
-</article>
+	<Footer about={data.about} policies={data.policies} fill={!!data.work.related?.length} />
+</div>
 
 <style lang="scss">
 @use '$lib/scss/breakpoints.module' as bp;
@@ -153,6 +161,69 @@
 	position: fixed;
 	inset: 0;
 	z-index: 5;
+}
+
+.tail {
+	display: flex;
+	flex-direction: column;
+	margin-top: var(--sp-196);
+
+	// viewport minus the fixed header row (top offset + tag + gap below it),
+	// clamped for very short / very tall screens
+	&:has(#related) {
+		min-height: clamp(30rem, calc(100svh - var(--tagHeight) - var(--sp-15) * 2), 60rem);
+	}
+
+	@media (width <= #{bp.$md}) {
+		margin-top: var(--sp-110);
+	}
+
+	#related {
+		padding: 0 var(--sp-15);
+
+		h3 {
+			margin-bottom: var(--sp-20);
+		}
+		.related {
+			display: grid;
+			grid-template-columns: repeat(6, 1fr);
+			column-gap: var(--sp-15);
+			row-gap: var(--sp-30);
+
+			@media (width <= #{bp.$xl}) { grid-template-columns: repeat(4, 1fr); }
+			@media (width <= #{bp.$md}) { grid-template-columns: repeat(2, 1fr); }
+			@media (width <= #{bp.$xs}) { grid-template-columns: repeat(1, 1fr); }
+
+			.work {
+				a {
+					width: 100%;
+					padding-bottom: var(--sp-2);
+					:global(.media-container) {
+						border-radius: 3px;
+					}
+					@media (pointer: fine) {
+						&:hover {
+							:global(.content) {
+								transform: scale(1.02);
+							}
+						}
+					}
+					&:focus-visible {
+						:global(.content) {
+							transform: scale(1.02);
+						}
+					}
+					.client {
+						display: block;
+						margin-top: var(--sp-7);
+					}
+					.title {
+						color: var(--gray);
+					}
+				}
+			}
+		}
+	}
 }
 
 article {
@@ -230,63 +301,7 @@ article {
 			}
 		}
 	}
-	#related {
-		padding: var(--sp-196) var(--sp-15) 0;
-
-		h3 {
-			margin-bottom: var(--sp-20);
-		}
-		.related {
-			display: grid;
-			grid-template-columns: repeat(6, 1fr);
-			column-gap: var(--sp-15);
-			row-gap: var(--sp-30);
-
-			.work {
-				a {
-					width: 100%;
-					padding-bottom: var(--sp-2);
-					:global(.media-container) {
-						border-radius: 3px;
-					}
-					@media (pointer: fine) {
-						&:hover {
-							:global(.content) {
-								transform: scale(1.02);
-							}
-						}
-					}
-					&:focus-visible {
-						:global(.content) {
-							transform: scale(1.02);
-						}
-					}
-					.client {
-						display: block;
-						margin-top: var(--sp-7);
-					}
-					.title {
-						color: var(--gray);
-					}
-				}
-			}
-		}
-	}
-	@media (width <= #{bp.$xl}) {
-		#related {
-			.related {
-				grid-template-columns: repeat(4, 1fr);
-			}
-		}
-	}
 	@media (width <= #{bp.$md}) {
-		#related {
-			padding: var(--sp-110) var(--sp-15) 0;
-
-			.related {
-				grid-template-columns: repeat(2, 1fr);
-			}
-		}
 		#blocks {
 			.blocks {
 				flex-direction: column;
@@ -310,13 +325,6 @@ article {
 			.informations {
 				grid-column: 1 / span 12;
 				grid-row: 1;
-			}
-		}
-	}
-	@media (width <= #{bp.$xs}) {
-		#related {
-			.related {
-				grid-template-columns: repeat(1, 1fr);
 			}
 		}
 	}

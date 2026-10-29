@@ -32,7 +32,8 @@
 				<main data-template={getTemplate(page.route.id)}>
 					{@render children()}
 				</main>
-				{#if page.route.id !== '/about'}
+				<!-- about has none; work pages render it themselves (see .tail there) -->
+				{#if page.route.id !== '/about' && page.route.id !== '/works/[client]/[work]'}
 					<Footer about={data.about} policies={data.policies} />
 				{/if}
 			</div>

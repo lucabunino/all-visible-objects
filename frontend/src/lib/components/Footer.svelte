@@ -1,11 +1,12 @@
 <script>
-	let { about, policies = [] } = $props()
+	/** @type {{about: any, policies?: any[], fill?: boolean}} */
+	let { about, policies = [], fill = false } = $props()
 	let scrollY = $state(0)
 </script>
 
 <svelte:window bind:scrollY />
 
-<footer>
+<footer class:fill>
 	{#if about.email}
 		<a class="talk tag" href="mailto:{about.email}">A new project in mind? Let’s talk.</a>
 	{/if}
@@ -79,6 +80,19 @@ footer {
 			}
 		}
 	}
+	// fill (work pages): grows into the parent's leftover height; the "Let's
+	// talk" tag centres in it via auto margins, never closer than the min gap
+	&.fill {
+		flex: 1;
+		padding-top: var(--sp-60);
+		row-gap: var(--sp-60);
+
+		.talk {
+			flex-basis: auto;
+			margin: auto;
+		}
+	}
+
 	@media (width <= #{bp.$xxs}) {
 		.footer {
 			.break {
