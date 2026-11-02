@@ -93,14 +93,18 @@
 				<dt>Typology</dt>
 				<dd>{data.work.typology.title}</dd>
 			{/if}
-			{#if data.work.year}
+			{#if data.work.year || data.work.ongoing}
 				<dt>Year</dt>
-				<dd>{data.work.year.slice(0, 4)}</dd>
+				<dd>
+					{#if data.work.year}{data.work.year.slice(0, 4)}{#if data.work.ongoing}{' – Ongoing'}{/if}{:else}Ongoing{/if}
+				</dd>
 			{/if}
 			{#if data.work.services?.length}
 				<dt>Services</dt>
 				<dd>
-					{data.work.services.map((/** @type {any} */ service) => service.title).join(', ')}
+					{#each data.work.services as service}
+						<span class="service">{service.title}</span>
+					{/each}
 				</dd>
 			{/if}
 			{#if data.work.credits?.length}
@@ -291,6 +295,17 @@ article {
 
 			dt { grid-column: 1 / span 1; }
 			dd { grid-column: 2 / span 5; }
+
+			// one per line on desktop; mobile keeps the inline comma list
+			.service {
+				display: block;
+
+				@media (width <= #{bp.$md}) {
+					display: inline;
+
+					&:not(:last-child)::after { content: ', '; }
+				}
+			}
 		}
 
 		.informations {

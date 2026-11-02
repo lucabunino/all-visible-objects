@@ -52,6 +52,7 @@
 				...(displayDesc && { description: displayDesc }),
 				...(socialImageUrl && { image: socialImageUrl }),
 				...(work.year && { dateCreated: work.year.slice(0, 4) }),
+				...(work.ongoing && { creativeWorkStatus: 'Ongoing' }),
 				...(work.typology?.title && { genre: work.typology.title }),
 				...(work.services?.length && { keywords: work.services.map((/** @type {any} */ s) => s.title).join(', ') }),
 				creator: { '@id': org['@id'] },

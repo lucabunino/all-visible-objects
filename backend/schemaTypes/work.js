@@ -70,7 +70,14 @@ export default {
 		{
 			name: 'year',
 			type: 'date',
-			description: 'Select January 1st of the target year',
+			description: 'Select January 1st of the target year (the start year, if ongoing). Optional',
+			group: 'Details',
+		},
+		{
+			name: 'ongoing',
+			type: 'boolean',
+			description: 'Shows "Ongoing" — after the year if one is set, on its own otherwise',
+			initialValue: false,
 			group: 'Details',
 		},
 		{

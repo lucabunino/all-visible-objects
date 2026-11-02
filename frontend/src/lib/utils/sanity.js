@@ -114,6 +114,7 @@ export async function getWork(clientSlug, workSlug) {
 			},
 			typology->{title},
 			year,
+			ongoing,
 			services[]->{title},
 			blocks[]{
 				_key,

@@ -44,7 +44,7 @@
 		max-width: 33rem;
 		padding: var(--sp-8);
 		color: var(--white);
-		background-color: var(--tagBg);
+		background-color: var(--gray);
 		backdrop-filter: blur(var(--blur));
 		isolation: isolate;
 		mix-blend-mode: normal;
