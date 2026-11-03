@@ -76,7 +76,7 @@ export default {
 		{
 			name: 'ongoing',
 			type: 'boolean',
-			description: 'Shows "Ongoing" — after the year if one is set, on its own otherwise',
+			description: 'Shows “Ongoing”: after the year if one is set, on its own otherwise',
 			initialValue: false,
 			group: 'Details',
 		},

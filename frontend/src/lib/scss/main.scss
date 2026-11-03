@@ -3,7 +3,8 @@
 :root {
 	--white: #FFF;
 	--black: #000;
-	--gray: #0000004D; // black at 30% — tag/button glass background + secondary text
+	--gray: #0000004D; // black at 30% — secondary text
+	--gray-bg: #00000033; // black at 20% — tag/button glass + banner backgrounds
 	--gray-light: #878787;
 	--gray-subtle: #ededed;
 	--focusColor: #fafafa;
@@ -20,7 +21,7 @@
 	--transition-xs: var(--ease-out) .2s;
 	--transition-tag: var(--ease-in-out) .3s;
 	// tag/button glass backdrop blur (small radius, cheap enough for touch
-	// devices too) — background is --gray
+	// devices too) — background is --gray-bg
 	--blur: 9px;
 
 	@for $i from 1 through 200 {
@@ -82,7 +83,7 @@ body {
 .tag:any-link {
 	display: inline-block;
 	color: var(--white);
-	background-color: var(--gray);
+	background-color: var(--gray-bg);
 	backdrop-filter: blur(var(--blur));
 	padding: var(--sp-8);
 	line-height: 1cap;
@@ -125,18 +126,18 @@ body {
 	&.black {
 		background-color: var(--black);
 		&.active {
-			background-color: var(--gray);
+			background-color: var(--gray-bg);
 			opacity: 1;
 		}
 		@media (pointer: fine) {&:not(.no-pointer):hover {
-			background-color: var(--gray);
+			background-color: var(--gray-bg);
 			opacity: 1;
 		}}
 
 		&:focus-visible {
 			outline-width: 1px;
 			outline-offset: 0;
-			background-color: var(--gray);
+			background-color: var(--gray-bg);
 			opacity: 1;
 		}
 	}

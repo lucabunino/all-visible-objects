@@ -264,7 +264,7 @@ article {
 						min-height: 200px;
 						place-content: center;
 						text-align: center;
-						background-color: var(--gray);
+						background-color: var(--gray-bg);
 						color: var(--white);
 						margin: calc(var(--sp-15)*-1);
 					}
@@ -281,7 +281,7 @@ article {
 		min-height: 50vh;
 		place-content: center;
 		text-align: center;
-		background-color: var(--gray);
+		background-color: var(--gray-bg);
 		color: var(--white);
 	}
 	#details {

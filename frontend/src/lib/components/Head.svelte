@@ -1,6 +1,7 @@
 <script>
 	import { page } from '$app/state'
 	import { urlFor } from '$lib/utils/image.js'
+	import { dev } from '$app/environment'
 
 	const seoBase = $derived(page.data?.seo)
 	const seoSingle = $derived(page.data?.seoSingle)
@@ -56,7 +57,7 @@
 				...(work.typology?.title && { genre: work.typology.title }),
 				...(work.services?.length && { keywords: work.services.map((/** @type {any} */ s) => s.title).join(', ') }),
 				creator: { '@id': org['@id'] },
-				...(work.client?.title && { funder: { '@type': 'Organization', name: work.client.title } }),
+				...(work.client?.title && { funder: { '@type': 'Organization', name: work.client.title, ...(work.client.href && { url: work.client.href }) } }),
 				isPartOf: { '@id': `${origin}/#website` }
 			})
 		} else if (page.route.id === '/about') {
@@ -99,4 +100,14 @@
 		<meta name="robots" content="index, follow" />
 	{/if}
 	{@html `<script type="application/ld+json">${jsonLd}</script>`}
+	<!-- Umami analytics: never in dev, and data-domains keeps Vercel previews
+	untracked — only the production domain reports -->
+	{#if !dev}
+		<script
+			defer
+			src="https://cloud.umami.is/script.js"
+			data-website-id="1196ead7-123d-4352-8935-f9d195c6aa1e"
+			data-domains="allvisibleobjects.com,www.allvisibleobjects.com"
+		></script>
+	{/if}
 </svelte:head>
