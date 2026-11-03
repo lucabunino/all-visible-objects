@@ -110,7 +110,8 @@ export async function getWork(clientSlug, workSlug) {
 			client-> {
 				title,
 				slug,
-				status
+				status,
+				href
 			},
 			typology->{title},
 			year,

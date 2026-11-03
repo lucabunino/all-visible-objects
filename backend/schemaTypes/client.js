@@ -19,6 +19,17 @@ export default {
 			validation: Rule => Rule.required(),
 			options: {source: 'title', maxLength: 96},
 		},
+		{
+			name: 'href',
+			title: 'Link',
+			type: 'string',
+			description: 'Optional: linked from the project details',
+			validation: Rule =>
+				Rule.custom(href => {
+					if (!href) return true
+					return /^https?:\/\//.test(href) ? true : 'Must be a valid URL'
+				}),
+		},
 		{...status},
 		{
 			name: 'works',

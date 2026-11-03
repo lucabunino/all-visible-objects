@@ -88,15 +88,21 @@
 	<section id="details">
 		<dl class="details">
 			<dt>Client</dt>
-			<dd>{data.work.client?.title}</dd>
+			<dd>
+				{#if data.work.client?.href}
+					<a class="hover-gray" href={data.work.client.href} target="_blank" rel="noopener noreferrer">{data.work.client.title} ↗</a>
+				{:else}
+					{data.work.client?.title}
+				{/if}
+			</dd>
 			{#if data.work.typology}
 				<dt>Typology</dt>
 				<dd>{data.work.typology.title}</dd>
 			{/if}
 			{#if data.work.year || data.work.ongoing}
 				<dt>Year</dt>
-				<dd>
-					{#if data.work.year}{data.work.year.slice(0, 4)}{#if data.work.ongoing}{' – Ongoing'}{/if}{:else}Ongoing{/if}
+				<dd class="year">
+					{#if data.work.year}{data.work.year.slice(0, 4)}{#if data.work.ongoing}{' — Ongoing'}{/if}{:else}Ongoing{/if}
 				</dd>
 			{/if}
 			{#if data.work.services?.length}
@@ -296,15 +302,12 @@ article {
 			dt { grid-column: 1 / span 1; }
 			dd { grid-column: 2 / span 5; }
 
-			// one per line on desktop; mobile keeps the inline comma list
 			.service {
 				display: block;
+			}
 
-				@media (width <= #{bp.$md}) {
-					display: inline;
-
-					&:not(:last-child)::after { content: ', '; }
-				}
+			.year {
+				font-feature-settings: "lnum";
 			}
 		}
 
