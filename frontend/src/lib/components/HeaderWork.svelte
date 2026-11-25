@@ -185,7 +185,10 @@
 	{/snippet}
 
 	<header>
-		<div class="menu" role="menubar" tabindex="-1" bind:this={headerMenuEl} onkeydown={handleTopLevelKeydown}>
+		<!-- plain wrapper delegating ←/→ between the focusable tags; not an ARIA menubar
+		(its children are headings + links, which a menubar may not contain) -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div class="menu" bind:this={headerMenuEl} onkeydown={handleTopLevelKeydown}>
 			{#if navClient && !gallery.open}
 				<div id="client" class="menu-item tag-wrapper" role="none"
 				onmouseenter={isMobile ? undefined : openClientHover}

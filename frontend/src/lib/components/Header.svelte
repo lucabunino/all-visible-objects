@@ -290,7 +290,10 @@
 
 {#if headerVisible}
 	<header>
-		<div style:display="contents" role="menubar" tabindex="-1" bind:this={headerEl} onkeydown={handleTopLevelKeydown}>
+		<!-- plain wrapper delegating ←/→ between the focusable tags; not an ARIA menubar
+		(its children are links + nav, which a menubar may not contain) -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div style:display="contents" bind:this={headerEl} onkeydown={handleTopLevelKeydown}>
 			{#if !gallery.open && !(isMobile && !showNav)}
 				<a id="logo" class="tag" href="/"
 				in:revealWidth|global={{ duration: DURATION, delay: TAG_DELAY }}

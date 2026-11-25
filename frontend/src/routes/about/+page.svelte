@@ -68,7 +68,8 @@
 			<li class="image">
 				{#key imageIndex}
 					<div class="frame" in:fadeBlur={{ duration: DURATION }} out:fade={{ duration: DURATION, delay: DURATION }}>
-						<Media media={data.about.images[imageIndex]} />
+						<!-- matches .images grid spans: 24/24, 8/24, 6/24, 4/24 -->
+						<Media media={data.about.images[imageIndex]} sizes="(max-width: 768px) 100vw, (max-width: 1024px) 34vw, (max-width: 1280px) 25vw, 17vw" />
 					</div>
 				{/key}
 			</li>

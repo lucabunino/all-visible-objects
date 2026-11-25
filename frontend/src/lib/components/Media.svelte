@@ -1,8 +1,8 @@
 <script>
 	import { urlFor, gallerySrcset, gallerySizes } from '$lib/utils/image.js'
 
-	/** @type {{media: any, bp?: number, width?: number, class?: string, opacity?: boolean, blur?: boolean, scale?: boolean, duration?: number, eager?: boolean}} */
-	let { media, bp = 768, width = 100, class: className = '', opacity = true, blur = true, scale = false, duration = 500, eager = false } = $props()
+	/** @type {{media: any, bp?: number, width?: number, sizes?: string, class?: string, opacity?: boolean, blur?: boolean, scale?: boolean, duration?: number, eager?: boolean}} */
+	let { media, bp = 768, width = 100, sizes: sizesProp, class: className = '', opacity = true, blur = true, scale = false, duration = 500, eager = false } = $props()
 
 	/** @param {() => string | undefined} fn */
 	function safely(fn) {
@@ -23,7 +23,8 @@
 		return widths.map((w) => `${safely(() => urlFor(image)?.width(w).url())} ${w}w`).join(', ')
 	}
 
-	const sizes = $derived(isGallery ? gallerySizes(bp, width) : `(max-width: ${bp}px) 100vw, ${width}vw`)
+	// `sizes` prop overrides when the layout changes width at more than one breakpoint
+	const sizes = $derived(sizesProp || (isGallery ? gallerySizes(bp, width) : `(max-width: ${bp}px) 100vw, ${width}vw`))
 
 	// snap to 2 decimals so exports a pixel off (2250x2813 vs 4:5) share a ratio —
 	// otherwise row neighbours differ by a subpixel and leave a hairline gap.
