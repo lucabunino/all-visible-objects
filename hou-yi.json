@@ -1,0 +1,323 @@
+{
+  "detected" : [
+    "sanity",
+    "scss"
+  ],
+  "dropped" : [
+
+  ],
+  "features" : [
+
+  ],
+  "format" : 1,
+  "ignoredChecks" : [
+    "a11y-review",
+    "reduced-motion",
+    "focus-visible",
+    "search-console",
+    "store-checkout-tested",
+    "paraglide-setup",
+    "swiper-element-api"
+  ],
+  "ignoredParts" : [
+
+  ],
+  "naPhases" : [
+
+  ],
+  "parts" : [
+    {
+      "id" : "backend",
+      "kind" : "sanity-studio",
+      "path" : "backend"
+    },
+    {
+      "id" : "frontend",
+      "kind" : "sveltekit-app",
+      "path" : "frontend"
+    },
+    {
+      "id" : "allvisibleobjects.com",
+      "kind" : "domain",
+      "url" : "https://www.allvisibleobjects.com/"
+    }
+  ],
+  "results" : [
+    {
+      "check" : "adapter-vercel",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "browsers-tested",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T14:15:02Z",
+      "outcome" : "pass",
+      "tree" : "bb0e2fd6153361efb1c0ec53baaff04b66bb531c"
+    },
+    {
+      "check" : "client-content-in",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T13:51:41Z",
+      "outcome" : "pass",
+      "tree" : "bb0e2fd6153361efb1c0ec53baaff04b66bb531c"
+    },
+    {
+      "check" : "client-studio-access",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T13:51:29Z",
+      "outcome" : "pass",
+      "tree" : "bb0e2fd6153361efb1c0ec53baaff04b66bb531c"
+    },
+    {
+      "check" : "desktop-details",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T13:51:26Z",
+      "outcome" : "pass",
+      "tree" : "bb0e2fd6153361efb1c0ec53baaff04b66bb531c"
+    },
+    {
+      "check" : "desktop-rhythm",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T13:51:21Z",
+      "outcome" : "pass",
+      "tree" : "bb0e2fd6153361efb1c0ec53baaff04b66bb531c"
+    },
+    {
+      "check" : "domain-https",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "allvisibleobjects.com",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "error-page",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "favicon",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "feedback-closed",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T14:15:16Z",
+      "outcome" : "pass",
+      "tree" : "bb0e2fd6153361efb1c0ec53baaff04b66bb531c"
+    },
+    {
+      "check" : "font-fallback",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "head-component",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "html-lang",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "images-srcset",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:33:47Z",
+      "note" : "Media takes sizes override; about carousel sizes match grid spans (100/34/25/17vw)",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "lighthouse-mobile",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:33:12Z",
+      "note" : "perf 93 · a11y 91 · bp 100 · seo 100",
+      "outcome" : "pass",
+      "part" : "allvisibleobjects.com",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "llms-txt",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "media-component",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "mobile-feel",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T13:51:39Z",
+      "outcome" : "pass",
+      "tree" : "bb0e2fd6153361efb1c0ec53baaff04b66bb531c"
+    },
+    {
+      "check" : "mobile-rhythm",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T13:51:20Z",
+      "outcome" : "pass",
+      "tree" : "bb0e2fd6153361efb1c0ec53baaff04b66bb531c"
+    },
+    {
+      "check" : "no-svelte-4-syntax",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "no-svelte-head-in-pages",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "old-site-redirects",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T14:18:10Z",
+      "outcome" : "pass",
+      "tree" : "bb0e2fd6153361efb1c0ec53baaff04b66bb531c"
+    },
+    {
+      "check" : "preload-scoped",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "robots-allow",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "allvisibleobjects.com",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "runes-mode",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "sanity-server-only",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "sass-embedded",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "scss-foundation",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "seo-files",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "staging-sent",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T13:51:32Z",
+      "outcome" : "pass",
+      "tree" : "bb0e2fd6153361efb1c0ec53baaff04b66bb531c"
+    },
+    {
+      "check" : "studio-auto-updates-off",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "backend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "studio-media-plugin",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "backend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "studio-plain-schemas",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "backend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "studio-seo-fields",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "backend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    },
+    {
+      "check" : "svelte-5",
+      "commit" : "3498d8e345495474198a5b8535e41a7208c058a3",
+      "date" : "2026-11-24T17:25:07Z",
+      "outcome" : "pass",
+      "part" : "frontend",
+      "tree" : "52340482855692b22f9ed7be05c1c02e2377e187"
+    }
+  ],
+  "state" : "live",
+  "traits" : [
+
+  ]
+}
